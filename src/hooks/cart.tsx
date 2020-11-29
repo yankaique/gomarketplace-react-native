@@ -30,22 +30,61 @@ const CartProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      // TODO LOAD ITEMS FROM ASYNC STORAGE
+      const [
+        id,
+        title,
+        image_url,
+        price,
+        quantity,
+      ] = await AsyncStorage.multiGet([
+        '@GoMarketplace:id',
+        '@GoMarketplace:title',
+        '@GoMarketplace:image_url',
+        '@GoMarketplace:price',
+        '@GoMarketplace:quantity',
+      ]);
+      const data = [
+        {
+          id: id[1],
+          title: title[1],
+          image_url: image_url[1],
+          price: price[1],
+          quantity: quantity[1],
+        },
+      ];
+      setProducts(data);
     }
 
     loadProducts();
   }, []);
 
   const addToCart = useCallback(async product => {
-    // TODO ADD A NEW ITEM TO THE CART
+    await AsyncStorage.multiSet([
+      ['@GoMarketplace:id', product.id],
+      ['@GoMarketplace:title', product.title],
+      ['@GoMarketplace:image_url', product.image_url],
+      ['@GoMarketplace:price', JSON.stringify(product.price)],
+    ]);
   }, []);
 
   const increment = useCallback(async id => {
-    // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
+    const item = products
+      .filter(elements => elements.id === id)
+      .map(items => ({
+        ...items,
+        quantity: items.quantity + 1,
+      }));
+    console.log(item[0]);
   }, []);
 
   const decrement = useCallback(async id => {
-    // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
+    const item = products
+      .filter(elements => elements.id === id)
+      .map(items => ({
+        ...items,
+        quantity: items.quantity - 1,
+      }));
+    console.log(item[0]);
   }, []);
 
   const value = React.useMemo(
